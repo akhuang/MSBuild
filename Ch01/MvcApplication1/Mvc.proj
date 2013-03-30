@@ -1,0 +1,73 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project DefaultTargets="HelloWorld" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+    <PropertyGroup>
+        <AppServer>\\sayedApp</AppServer>
+        <WebServer>\\sayedWeb</WebServer>
+    </PropertyGroup>
+
+    <Target Name="HelloWorld">
+        <Message Text="Hello World" />
+    </Target>
+
+    <!--编译task: msbuild mvc.proj /t:helloworld-->
+
+    <PropertyGroup>
+        <HelloMessage>Hello from property </HelloMessage>
+    </PropertyGroup>
+
+    <Target Name="HelloProperty">
+        <Message Text="$(HelloMessage)" />
+    </Target>
+
+    <ItemGroup>
+        <SolutionFile Include="MvcApplication1.sln" />
+        <SourceFiles ></SourceFiles>
+    </ItemGroup>
+    <Target Name="PrintSolutionInfo">
+        <Message Text="SolutionFile: @(SolutionFile)" />
+    </Target>
+
+    <!--多个值-->
+    <ItemGroup>
+        <Compile Include="Form1.cs;Form1.Designer.cs;Program.cs;Properties\AssemblyInfo.cs" />
+    </ItemGroup>
+    <Target Name="PrintCompileInfo">
+        <Message Text="Compile: @(Compile)" />
+    </Target>
+
+    <ItemGroup>
+        <src Include="src\one.txt" />
+    </ItemGroup>
+    <Target Name="PrintWellKnownMetadata">
+        <Message Text="===== Well known metadata ====="/>
+        <!-- %40 = @ -->
+        <!-- %25 = % -->
+        <Message Text="%40(src->'%25(FullPath)'): @(src->'%(FullPath)')"/>
+        <Message Text="%40(src->'%25(RootDir)'): @(src->'%(RootDir)')"/>
+        <Message Text="%40(src->'%25(Filename)'): @(src->'%(Filename)')"/>
+        <Message Text="%40(src->'%25(Extension)'): @(src->'%(Extension)')"/>
+        <Message Text="%40(src->'%25(RelativeDir)'): @(src->'%(RelativeDir)')"/>
+        <Message Text="%40(src->'%25(Directory)'): @(src->'%(Directory)')"/>
+        <Message Text="%40(src->'%25(RecursiveDir)'): @(src->'%(RecursiveDir)')"/>
+        <Message Text="%40(src->'%25(Identity)'): @(src->'%(Identity)')"/>
+        <Message Text="%40(src->'%25(ModifiedTime)'): @(src->'%(ModifiedTime)')"/>
+        <Message Text="%40(src->'%25(CreatedTime)'): @(src->'%(CreatedTime)')"/>
+        <Message Text="%40(src->'%25(AccessedTime)'): @(src->'%(AccessedTime)')"/>
+    </Target>
+    <!--
+	===== Well known metadata =====
+		@(src->'%(FullPath)'): d:\Programming\GitWorking\MSBuild\Ch01\MvcApplication1
+		\src\one.txt
+		@(src->'%(RootDir)'): d:\
+		@(src->'%(Filename)'): one
+		@(src->'%(Extension)'): .txt
+		@(src->'%(RelativeDir)'): src\
+		@(src->'%(Directory)'): Programming\GitWorking\MSBuild\Ch01\MvcApplication1\s
+		rc\
+		@(src->'%(RecursiveDir)'):
+		@(src->'%(Identity)'): src\one.txt
+		@(src->'%(ModifiedTime)'):
+		@(src->'%(CreatedTime)'):
+		@(src->'%(AccessedTime)'):
+	-->
+</Project>
