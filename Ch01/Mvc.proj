@@ -1,8 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 
     <PropertyGroup>
-        <SrcFolder>$(MSBuildProjectDirectory\src</SrcFolder>
+        <SrcFolder>$(MSBuildProjectDirectory)\src</SrcFolder>
+        <BuildFolder>$(MSBuildProjectDirectory)\build</BuildFolder>
+        <BuildPlatform Condition="$(BuildPlatform) == ''">x86</BuildPlatform>
     </PropertyGroup>
 
     <Target Name="CustomAfterBuild">
@@ -13,5 +15,21 @@
     <Target Name="Build">
         <CallTarget Targets="Clean"></CallTarget>
         <CallTarget Targets="Compile"></CallTarget>
+    </Target>
+
+    <Target Name="Clean">
+        <MSBuild Projects="$(SrcFolder)\MvcApplication1.sln"
+                 Targets="Clean">
+        </MSBuild>
+        <RemoveDir  Directories="$(BuildFolder)" ContinueOnError="true"></RemoveDir>
+
+    </Target>
+
+    <Target Name="Compile">
+        <MSBuild Projects="$(SrcFolder)\MvcApplication1.sln"
+                 Targets="Build"
+                 Properties="Configuration=Release;OutputPath=$(BuildFolder)">
+        </MSBuild>
+        <MSBuild Projects="$(SrcFolder)\MvcApplication1.sln" Targets="Build"></MSBuild>
     </Target>
 </Project>
