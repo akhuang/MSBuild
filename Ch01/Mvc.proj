@@ -4,32 +4,48 @@
     <PropertyGroup>
         <SrcFolder>$(MSBuildProjectDirectory)\src</SrcFolder>
         <BuildFolder>$(MSBuildProjectDirectory)\build</BuildFolder>
+
+        <CompileFolder>$(BuildFolder)\Compile</CompileFolder>
+        <DeployFolder>$(BuildFolder)\Deploy</DeployFolder>
+        <WebSitesFolder>$(CompileFolder)\_PublishedWebsites</WebSitesFolder>
+
         <BuildPlatform Condition="$(BuildPlatform) == ''">x86</BuildPlatform>
     </PropertyGroup>
 
-    <Target Name="CustomAfterBuild">
-        <Message Text="Inside CustomAfterBuild target" Importance="high"></Message>
-    </Target>
+    <ItemGroup>
+        <ProjectReference Include="$(SrcFolder)\MvcApplication1\MvcApplication1.csproj"></ProjectReference>
+        <ProjectReference Include="$(SrcFolder)\Core\Core.csproj"></ProjectReference>
+        <ProjectReference Include="$(SrcFolder)\WcfService1\WcfService1.csproj"></ProjectReference>
+
+        <SoureFiles Include="$(WebSitesFolder)\**\*"></SoureFiles>
+    </ItemGroup>
 
     <!-- Building -->
     <Target Name="Build">
         <CallTarget Targets="Clean"></CallTarget>
         <CallTarget Targets="Compile"></CallTarget>
+        <CallTarget Targets="MsDeploy"></CallTarget>
     </Target>
 
     <Target Name="Clean">
-        <MSBuild Projects="$(SrcFolder)\MvcApplication1.sln"
+        <!--<MSBuild Projects="$(SrcFolder)\MvcApplication1.sln;"
                  Targets="Clean">
-        </MSBuild>
+        </MSBuild>-->
+        <MSBuild Projects="@(ProjectReference)" BuildInParallel="true" Targets="Clean"></MSBuild>
         <RemoveDir  Directories="$(BuildFolder)" ContinueOnError="true"></RemoveDir>
-
     </Target>
 
     <Target Name="Compile">
-        <MSBuild Projects="$(SrcFolder)\MvcApplication1.sln"
+        <!--<MSBuild Projects="$(SrcFolder)\MvcApplication1.sln"
                  Targets="Build"
-                 Properties="Configuration=Release;OutputPath=$(BuildFolder)">
+                 Properties="Configuration=Release;OutputPath=$(CompileFolder)">
+        </MSBuild>-->
+        <!--<MSBuild Projects="$(SrcFolder)\MvcApplication1.sln" Targets="Build"></MSBuild>-->
+        <MSBuild Projects="@(ProjectReference)" Targets="Build" Properties="Configuration=Release;OutputPath=$(CompileFolder)">
         </MSBuild>
-        <MSBuild Projects="$(SrcFolder)\MvcApplication1.sln" Targets="Build"></MSBuild>
+    </Target>
+
+    <Target Name="MsDeploy">
+        <Copy SourceFiles="@(SoureFiles)" DestinationFolder="$(DeployFolder)\%(RecursiveDir)"></Copy>
     </Target>
 </Project>
