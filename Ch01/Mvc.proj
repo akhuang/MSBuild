@@ -2,6 +2,11 @@
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="4.0">
 
     <PropertyGroup>
+        <DatabaseConnectionString>Data Source=.\SQLEXPRESS;Initial Catalog=aspnet-MvcApplication1-20130328214103;Integrated Security=SSPI</DatabaseConnectionString>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <LibFolder>$(MSBuildProjectDirectory)\lib</LibFolder>
         <SrcFolder>$(MSBuildProjectDirectory)\src</SrcFolder>
         <BuildFolder>$(MSBuildProjectDirectory)\build</BuildFolder>
 
@@ -9,22 +14,26 @@
         <DeployFolder>$(BuildFolder)\Deploy</DeployFolder>
         <WebSitesFolder>$(CompileFolder)\_PublishedWebsites</WebSitesFolder>
 
+        <Configuration>Release</Configuration>
+        <OutputPath>$(CompileFolder)</OutputPath>
+
         <BuildPlatform Condition="$(BuildPlatform) == ''">x86</BuildPlatform>
     </PropertyGroup>
+
+    <Import Project="$(LibFolder)\msbuild\MSBuild.Community.Tasks.Targets"/>
 
     <ItemGroup>
         <ProjectReference Include="$(SrcFolder)\MvcApplication1\MvcApplication1.csproj"></ProjectReference>
         <ProjectReference Include="$(SrcFolder)\Core\Core.csproj"></ProjectReference>
         <ProjectReference Include="$(SrcFolder)\WcfService1\WcfService1.csproj"></ProjectReference>
-
-        <SoureFiles Include="$(WebSitesFolder)\**\*"></SoureFiles>
     </ItemGroup>
 
     <!-- Building -->
     <Target Name="Build">
-        <CallTarget Targets="Clean"></CallTarget>
-        <CallTarget Targets="Compile"></CallTarget>
+        <!--<CallTarget Targets="Clean"></CallTarget>
+        <CallTarget Targets="Compile"></CallTarget>-->
         <CallTarget Targets="MsDeploy"></CallTarget>
+        <CallTarget Targets="UpdateConfig"></CallTarget>
     </Target>
 
     <Target Name="Clean">
@@ -41,11 +50,25 @@
                  Properties="Configuration=Release;OutputPath=$(CompileFolder)">
         </MSBuild>-->
         <!--<MSBuild Projects="$(SrcFolder)\MvcApplication1.sln" Targets="Build"></MSBuild>-->
-        <MSBuild Projects="@(ProjectReference)" Targets="Build" Properties="Configuration=Release;OutputPath=$(CompileFolder)">
+        <MSBuild Projects="@(ProjectReference)" Targets="Build" Properties="Configuration=Release;OutputPath=$(OutputPath)">
         </MSBuild>
+        <ItemGroup>
+            <SoureFiles Include="$(WebSitesFolder)\**\*"></SoureFiles>
+        </ItemGroup>
     </Target>
 
-    <Target Name="MsDeploy">
+    <ItemGroup>
+        <DeployConfigs  Include="$(DeployFolder)\**\web.config"></DeployConfigs>
+    </ItemGroup>
+    <Target Name="MsDeploy" DependsOnTargets="Compile">
         <Copy SourceFiles="@(SoureFiles)" DestinationFolder="$(DeployFolder)\%(RecursiveDir)"></Copy>
+    </Target>
+
+    <Target Name="UpdateConfig" DependsOnTargets="MsDeploy">
+        <XmlUpdate XmlFileName="$(BuildFolder)\Deploy\MvcApplication1\Web.config" Namespace="http://schemas.microsoft.com/.NetConfiguration/v2.0"
+                   XPath="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString"
+                   Value="aa">
+        </XmlUpdate>
+
     </Target>
 </Project>
