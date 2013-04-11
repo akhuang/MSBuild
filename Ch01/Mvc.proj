@@ -67,7 +67,7 @@
     <Target Name="UpdateConfig" DependsOnTargets="MsDeploy">
         <XmlUpdate XmlFileName="$(BuildFolder)\Deploy\MvcApplication1\Web.config" Namespace="http://schemas.microsoft.com/.NetConfiguration/v2.0"
                    XPath="/configuration/connectionStrings/add[@name='DefaultConnection']/@connectionString"
-                   Value="aa">
+                   Value="$(DatabaseConnectionString)">
         </XmlUpdate>
 
     </Target>
